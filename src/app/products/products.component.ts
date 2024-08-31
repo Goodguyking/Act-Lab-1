@@ -15,10 +15,11 @@ export class ProductsComponent implements OnInit {
   selectedCategory: string = '';
   productForm: FormGroup;
   editForm: FormGroup;
-  selectedFile: File | null = null;
   currentProductId: number | null = null;
   isEditModalOpen: boolean = false;
-  displayCount: number = 5;
+  displayCount: number = 20;
+  isFormVisible: boolean = false;
+  currentProduct: | null = null;  // For holding the product being edited
 
   constructor(
     private fb: FormBuilder,
@@ -26,7 +27,7 @@ export class ProductsComponent implements OnInit {
   ) {
     this.productForm = this.fb.group({
       title: ['', Validators.required],
-      price: ['', Validators.required],
+      price: ['', [Validators.required, Validators.min(0)]],
       description: ['', Validators.required],
       category: ['', Validators.required],
       image: ['']
@@ -34,7 +35,7 @@ export class ProductsComponent implements OnInit {
 
     this.editForm = this.fb.group({
       title: ['', Validators.required],
-      price: ['', Validators.required],
+      price: ['', [Validators.required, Validators.min(0)]],
       description: ['', Validators.required],
       category: ['', Validators.required],
       image: ['']
@@ -71,13 +72,7 @@ export class ProductsComponent implements OnInit {
 
   openEditModal(product: any): void {
     this.currentProductId = product.id;
-    this.editForm.patchValue({
-      title: product.title,
-      price: product.price,
-      description: product.description,
-      category: product.category,
-      image: product.image
-    });
+    this.editForm.patchValue(product);
     this.isEditModalOpen = true;
   }
 
@@ -110,20 +105,15 @@ export class ProductsComponent implements OnInit {
 
   addProduct(): void {
     if (this.productForm.valid) {
-      const formData = new FormData();
-      formData.append('title', this.productForm.get('title')?.value);
-      formData.append('price', this.productForm.get('price')?.value);
-      formData.append('description', this.productForm.get('description')?.value);
-      formData.append('category', this.productForm.get('category')?.value);
-      if (this.selectedFile) {
-        formData.append('image', this.selectedFile, this.selectedFile.name);
-      }
-
-      this.productService.addProduct(formData).subscribe(
+      console.log('Form Data:', this.productForm.value); // Debugging
+      this.productService.addProduct(this.productForm.value).subscribe(
         (response) => {
-          this.loadProducts();
-          this.productForm.reset();
-          this.selectedFile = null;
+          console.log('Product added:', response); // Debugging
+          // Temporarily simulate adding the product
+          const newProduct = { ...this.productForm.value, id: response.id };
+          this.products.push(newProduct); // Add the new product to the list
+          this.filteredProducts = [...this.products]; // Update filtered products
+          this.productForm.reset(); // Reset the form after successful submission
         },
         (error) => {
           console.error('Error adding product:', error);
@@ -133,6 +123,7 @@ export class ProductsComponent implements OnInit {
       console.error('Form is invalid');
     }
   }
+  
 
   deleteProduct(id: number): void {
     this.productService.deleteProduct(id).subscribe(
@@ -181,14 +172,16 @@ export class ProductsComponent implements OnInit {
     }
   }
 
-// In the component
-setDisplayCount(event: Event): void {
-  const target = event.target as HTMLSelectElement; // Type assertion
-  const count = parseInt(target.value, 10);
-  this.displayCount = count;
-  this.updateFilteredProducts();
-}
+  setDisplayCount(event: Event): void {
+    const target = event.target as HTMLSelectElement;
+    const count = parseInt(target.value, 10);
+    this.displayCount = count;
+    this.updateFilteredProducts();
+  }
+
   updateFilteredProducts(): void {
+    console.log('Filtered Products:', this.filteredProducts); // Debug line
     this.filteredProducts = this.products.slice(0, this.displayCount);
   }
+  
 }

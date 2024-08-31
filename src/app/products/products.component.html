@@ -5,7 +5,7 @@
     <input id="title" formControlName="title" />
 
     <label for="price">Price</label>
-    <input id="price" formControlName="price" />
+    <input id="price" formControlName="price" type="number" />
 
     <label for="description">Description</label>
     <input id="description" formControlName="description" />
@@ -56,14 +56,13 @@
 <!-- Product Grid Container -->
 <div class="product-grid-container">
   <div class="product-card" *ngFor="let product of filteredProducts">
-    <img [src]="product.image" alt="{{ product.title }}" class="product-image">
+    <img [src]="product.image" alt="{{ product.title }}" class="product-image" />
     <div class="product-details">
       <h3>{{ product.title }}</h3>
       <p class="product-description">{{ product.description }}</p>
       <p class="product-price">${{ product.price }}</p>
       <button (click)="openEditModal(product)" class="edit-button">Edit</button>
       <button (click)="deleteProduct(product.id)" class="delete-button">Delete</button>
-      <button class="buy-now-button">Buy Now</button>
     </div>
   </div>
 </div>
