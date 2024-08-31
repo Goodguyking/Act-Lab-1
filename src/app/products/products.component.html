@@ -1,0 +1,97 @@
+<!-- Product Form -->
+<div class="product-form">
+  <form [formGroup]="productForm" (ngSubmit)="addProduct()">
+    <label for="title">Title</label>
+    <input id="title" formControlName="title" />
+
+    <label for="price">Price</label>
+    <input id="price" formControlName="price" />
+
+    <label for="description">Description</label>
+    <input id="description" formControlName="description" />
+
+    <label for="category">Category</label>
+    <select id="category" formControlName="category">
+      <option *ngFor="let category of categories" [value]="category">{{ category }}</option>
+    </select>
+    
+    <label for="image">Image URL</label>
+    <input id="image" formControlName="image" />
+
+    <button type="submit">Add Product</button>
+  </form>
+</div>
+
+<!-- Filters and Controls -->
+<div class="filters-controls">
+  <!-- Search Form -->
+  <form (ngSubmit)="searchProductById()" class="search-form">
+    <label for="searchId">Search by Product ID:</label>
+    <input id="searchId" type="number" [(ngModel)]="searchId" name="searchId" />
+    <button type="submit">Search</button>
+  </form>
+
+  <!-- Category Dropdown -->
+  <div class="category-dropdown">
+    <label for="categorySelect">Filter by Category:</label>
+    <select id="categorySelect" [(ngModel)]="selectedCategory" (change)="filterByCategory()">
+      <option value="">All Categories</option>
+      <option *ngFor="let category of categories" [value]="category">{{ category }}</option>
+    </select>
+  </div>
+
+  <!-- Sort Buttons -->
+  <div class="sort-buttons">
+    <button (click)="sortProductsByPrice('asc')">Sort by Price: Low to High</button>
+    <button (click)="sortProductsByPrice('desc')">Sort by Price: High to Low</button>
+  </div>
+
+  <!-- Display Count Selector -->
+  <label for="displayCount">Show:</label>
+  <select id="displayCount" (change)="setDisplayCount($event)">
+    <option *ngFor="let count of [5, 10, 15, 20]" [value]="count">{{ count }}</option>
+  </select>
+</div>
+
+<!-- Product Grid Container -->
+<div class="product-grid-container">
+  <div class="product-card" *ngFor="let product of filteredProducts">
+    <img [src]="product.image" alt="{{ product.title }}" class="product-image">
+    <div class="product-details">
+      <h3>{{ product.title }}</h3>
+      <p class="product-description">{{ product.description }}</p>
+      <p class="product-price">${{ product.price }}</p>
+      <button (click)="openEditModal(product)" class="edit-button">Edit</button>
+      <button (click)="deleteProduct(product.id)" class="delete-button">Delete</button>
+      <button class="buy-now-button">Buy Now</button>
+    </div>
+  </div>
+</div>
+
+<!-- Edit Product Modal -->
+<div class="modal" *ngIf="isEditModalOpen">
+  <div class="modal-content">
+    <span class="close" (click)="closeEditModal()">&times;</span>
+    <h2>Edit Product</h2>
+    <form [formGroup]="editForm" (ngSubmit)="saveProduct()">
+      <label for="edit-title">Title</label>
+      <input id="edit-title" formControlName="title" />
+
+      <label for="edit-price">Price</label>
+      <input id="edit-price" formControlName="price" />
+
+      <label for="edit-description">Description</label>
+      <input id="edit-description" formControlName="description" />
+
+      <label for="edit-category">Category</label>
+      <select id="edit-category" formControlName="category">
+        <option *ngFor="let category of categories" [value]="category">{{ category }}</option>
+      </select>
+
+      <label for="edit-image">Image URL</label>
+      <input id="edit-image" formControlName="image" />
+
+      <button type="submit">Save</button>
+    </form>
+  </div>
+</div>
